@@ -15,7 +15,7 @@
 #include <sys/types.h>
 #include <errno.h>
 
-#include <flagrtb.h>
+#include <xgpu.h>
 
 #include "hashpipe.h"
 #include "flag_databuf.h"

@@ -9,7 +9,7 @@
 #include <pthread.h>
 #include <string.h>
 
-#include <flagrtb.h>
+#include <xgpu.h>
 #include "hashpipe.h"
 #include "flag_databuf.h"
 
@@ -47,22 +47,22 @@ static void * run(hashpipe_thread_args_t * args) {
     hputi4(st.buf, "GPUDEV", gpu_dev);
     hashpipe_status_unlock_safe(&st);
 
-    // Initialize flagRTB context structure
+    // Initialize xGPU context structure
     // Comment from PAPER:
     //   Initialize context to point at first input and output memory blocks.
     //   This seems redundant since we do this just before calling
-    //   flagrtbCudaXengine, but we need to pass something in for array_h and
-    //   matrix_x to prevent flagrtbInit from allocating memory.
-    FLAGRTBContext context;
+    //   xgpuCudaXengine, but we need to pass something in for array_h and
+    //   matrix_x to prevent xgpuInit from allocating memory.
+    XGPUContext context;
     context.array_h  = (ComplexInput *)db_in->block[0].data;
     context.matrix_h = (Complex *)db_out->block[0].data;
    
     context.array_len = (db_in->header.n_block * sizeof(flag_input_block_t) - sizeof(flag_input_header_t))/sizeof(ComplexInput);
     context.matrix_len = (db_out->header.n_block * sizeof(flag_correlator_output_block_t) - sizeof(flag_correlator_output_header_t))/sizeof(Complex);
 
-    int flagrtb_error = flagrtbInit(&context, gpu_dev);
-    if (FLAGRTB_OK != flagrtb_error) {
-        fprintf(stderr, "ERROR: flagRTB initialization failed (error code %d)\n", flagrtb_error);
+    int xgpu_error = xgpuInit(&context, gpu_dev);
+    if (XGPU_OK != xgpu_error) {
+        fprintf(stderr, "ERROR: xGPU initialization failed (error code %d)\n", xgpu_error);
         return THREAD_ERROR;
     }
     
@@ -178,12 +178,12 @@ static void * run(hashpipe_thread_args_t * args) {
         }
        
         fprintf(stderr, "COR: Running CUDA correlator\n");
-        flagrtbCudaXengine(&context, doDump ? SYNCOP_DUMP : SYNCOP_SYNC_TRANSFER);
+        xgpuCudaXengine(&context, doDump ? SYNCOP_DUMP : SYNCOP_SYNC_TRANSFER);
         fprintf(stderr, "COR: Finished CUDA code\n");
         
         if (doDump) {
             fprintf(stderr, "COR: Dumping...\n");
-            flagrtbClearDeviceIntegrationBuffer(&context);
+            xgpuClearDeviceIntegrationBuffer(&context);
             db_out->block[curblock_out].header.mcnt = last_mcnt;
             
             // Mark output block as full and advance

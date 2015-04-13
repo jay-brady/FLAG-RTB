@@ -20,9 +20,9 @@ AS_VAR_SET_IF(CFLAGS,[],[CFLAGS=])
 # Checks for programs.
 AC_PROG_CC
 
-# Check for HASHPIPE and xGPU
+# Check for HASHPIPE and flagRTB
 AX_CHECK_HASHPIPE
-AX_CHECK_XGPUINFO
+AX_CHECK_FLAGRTBINFO
 
 # Checks for libraries.
 AC_CHECK_LIB([pthread], [pthread_create])

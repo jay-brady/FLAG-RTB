@@ -1,0 +1,29 @@
+#!/bin/sh
+
+VF=flagrtb_version.h
+
+# Requires that version tags are annotated and start with v#
+VN=$(git describe --match "v[0-9]*" --abbrev=7 HEAD 2>/dev/null)
+
+git update-index -q --refresh
+test -z "$(git diff-index --name-only HEAD --)" || {
+  VN="$VN-dirty"
+}
+
+VN=$(echo "$VN" | sed -e 's/-/+/');
+VN=$(echo "$VN" | sed -e 's/-/@/');
+
+# Strip leading "v"(s)
+VN=$(expr "$VN" : v*'\(.*\)')
+
+if test -r $VF
+then
+  VC=$(sed -e 's/^#define FLAGRTB_VERSION //' <$VF)
+else
+  VC=unset
+fi
+
+test "$VN" = "$VC" || {
+  echo >&2 "#define FLAGRTB_VERSION $VN"
+  echo "#define FLAGRTB_VERSION $VN" >$VF
+}

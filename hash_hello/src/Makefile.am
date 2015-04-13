@@ -2,7 +2,7 @@ ACLOCAL_AMFLAGS = -I m4
 AM_CPPFLAGS     =
 
 AM_CPPFLAGS += -I"@HASHPIPE_INCDIR@"
-AM_CPPFLAGS += -I"@XGPU_INCDIR@"
+AM_CPPFLAGS += -I"@FLAGRTB_INCDIR@"
 
 # AM_CFLAGS is used for all C compiles
 # AM_CFLAGS = -ggdb -fPIC -O3 -Wall -Werror -fno-strict-aliasing -mavx
@@ -33,9 +33,9 @@ flag_threads = flag_net_thread.c \
 # This is the flag_gpu plugin itself
 lib_LTLIBRARIES = flag_gpu.la
 flag_gpu_la_SOURCES  = $(flag_databuf) $(flag_threads)
-flag_gpu_la_LIBADD   = -lrt -lxgpu
+flag_gpu_la_LIBADD   = -lrt -lflagrtb
 flag_gpu_la_LDFLAGS  = -avoid-version -module -shared -export-dynamic
-flag_gpu_la_LDFLAGS += -L"@XGPU_LIBDIR@" -Wl,-rpath,"@XGPU_LIBDIR@"
+flag_gpu_la_LDFLAGS += -L"@FLAGRTB_LIBDIR@" -Wl,-rpath,"@FLAGRTB_LIBDIR@"
 flag_gpu_la_LDFLAGS += -L"@HASHPIPE_LIBDIR@" -Wl,-rpath,"@HASHPIPE_LIBDIR@"
 
 # Installed scripts
